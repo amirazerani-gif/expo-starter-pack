@@ -20,11 +20,11 @@ Built on the Expo tabs template, extended with an auth-gated dashboard group tha
 - Default spacing and font size primitives
 
 ### 🔐 Auth & Role-Based Routing
-- Built on the Expo tabs template with an auth-gated `(protected)` dashboard group
+- Built on the Expo tabs template with an auth-gated `/(dashboard)` dashboard group
 - Supports unlimited roles — add role checks in the layout, no structural changes needed
 - Redirect protection built in — unauthenticated users are pushed to `(auth)`, wrong-role users are redirected automatically
 - Auth store wired and ready (`auth.store.ts`)
-- Separate `(auth)`, `(tabs)`, and `(protected)` route groups pre-scaffolded
+- Separate `(auth)`, `(tabs)`, and `(dashboard)` route groups pre-scaffolded
 
 ### 🌐 API Layer
 - Shared `axios` instance (`api/core/base.ts`) with:

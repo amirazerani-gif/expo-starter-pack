@@ -5,7 +5,9 @@
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.4.1",
     "@expo/vector-icons": "^15.0.2",
+    "@hookform/resolvers": "^5.9.1",
     "@react-native-community/netinfo": "12.0.1",
+    "@tanstack/react-query": "^5.104.3",
     "expo": "~57.0.30",
     "expo-constants": "~57.0.22",
     "expo-font": "~57.0.4",
@@ -17,8 +19,10 @@
     "expo-status-bar": "~57.0.1",
     "expo-symbols": "~57.0.3",
     "expo-web-browser": "~57.0.3",
+    "openapi-fetch": "^0.17.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-hook-form": "^7.90.0",
     "react-native": "0.86.3",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-reanimated": "4.5.1",
@@ -29,6 +33,7 @@
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.10.1",
     "sonner-native": "^0.26.2",
+    "zod": "^4.6.7",
     "zustand": "^5.0.13"
   },
   "devDependencies": {
@@ -39,7 +44,9 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "gen:api": "node --env-file=.env scripts/gen-api.mjs",
+    "mock": "npx -y @stoplight/prism-cli mock -h 0.0.0.0 -p 4010 openapi/openapi.yaml"
   },
   "private": true
 }
