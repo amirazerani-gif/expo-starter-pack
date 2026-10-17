@@ -1,11 +1,17 @@
 /**
  * api/pagination.ts
- * Standard Laravel page-number pagination: each list response carries
- * `data` plus `meta.current_page` / `meta.last_page`. unwrapPage turns that
- * into { items, nextPage } so infinite-query hooks stay one-liners.
+ * Pagination helpers for infinite lists, for standard Laravel page-number
+ * pagination (`data` plus `meta.current_page` / `meta.last_page`).
  *
- * If your API pages differently (cursor, offset...), change this file —
- * it is the only place that knows the paging shape.
+ *   unwrapPage  turns one response into { items, nextPage }
+ *   flatPages   flattens an infinite query's pages into a single array
+ *
+ * Usage (see hooks/resources/dev/Items.r.ts):
+ *   queryFn: ({ pageParam }) => unwrapPage(client.GET("/v1/items", ...))
+ *   getNextPageParam: (last) => last.nextPage ?? undefined
+ *
+ * If your API pages differently (cursor, offset...), change this file; it is
+ * the only place that knows the paging shape.
  */
 type LaravelPage<T> = {
   data: T[];
@@ -23,6 +29,5 @@ export async function unwrapPage<T>(
   };
 }
 
-/** Flattens an infinite query's pages into one list. */
 export const flatPages = <T>(data?: { pages: { items: T[] }[] }): T[] =>
   data?.pages.flatMap((page) => page.items) ?? [];

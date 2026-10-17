@@ -25,8 +25,8 @@ paths:
               type: object
               required: [login, password]
               properties:
-                login: { type: string }
-                password: { type: string }
+                login: { type: string, minLength: 1 }
+                password: { type: string, minLength: 1 }
                 device_name: { type: string }
       responses:
         "200":
@@ -295,7 +295,9 @@ components:
           example:
             message: The given data was invalid.
             errors:
-              field: [The field is invalid.]
+              login: [The login field is required.]
+              password: [The password field is required.]
+              title: [The title field is required.]
 
   schemas:
     User:

@@ -1,9 +1,14 @@
 /**
  * api/types.ts
- * Helpers to name request/response types straight from the generated schema.
- *   JsonBody<"/v1/auth/login", "post">   request body
- *   ResData<"/v1/items/{item}">          the `data` of a 200 response
+ * Type helpers that name request and response shapes straight from the
+ * generated schema, so no type is ever written by hand.
+ *
+ *   JsonBody<"/v1/auth/login", "post">   request body of an endpoint
+ *   ResData<"/v1/items/{item}">          `data` of a 200 response
  *   ResItem<"/v1/items">                 one element of a list response
+ *
+ * The method argument defaults to "get". Regenerate the schema with
+ * `npm run gen:api` and these types follow automatically.
  */
 import type { paths } from "./schema";
 

@@ -1,6 +1,14 @@
+/**
+ * hooks/core/useErrorListener.tsx
+ * Displays errors published to the error store as toasts. Mount
+ * <ErrorToastListener /> once, inside the root layout, next to <Toaster />.
+ *
+ * To change how an error type looks (emoji, title), edit ERROR_CONFIG.
+ * Server and network errors stay on screen longer than the rest.
+ */
+import { useErrorStore } from "@/stores/core/error.store";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner-native";
-import { useErrorStore } from "@/stores/core/error.store";
 
 const ERROR_CONFIG: Record<string, { emoji: string; title: string }> = {
   validation: { emoji: "⚠️", title: "Validation Error" },

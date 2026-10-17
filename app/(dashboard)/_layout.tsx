@@ -1,43 +1,40 @@
 /**
- * app/(protected)/_layout.tsx
- * ─────────────────────────────────────────────────────────────
- * Guards all child routes behind authentication and redirects
- * each role to its own sub-group.
+ * app/(dashboard)/_layout.tsx
+ * Route guard for the authenticated area. Everything under (dashboard) is
+ * only reachable while signed in.
  *
- * FOLDER STRUCTURE (create these as needed):
- *   app/(protected)/
- *     _layout.tsx        ← this file
- *     admin/
- *       _layout.tsx
- *       index.tsx
- *     user/
- *       _layout.tsx
- *       index.tsx
+ * Behavior:
+ *  - guests are redirected to the login screen
+ *  - signed-in users landing outside a known group are sent to DEFAULT_GROUP
+ *  - ending the session anywhere (logout, 401) re-runs the guard and
+ *    returns the user to login automatically
+ * The root layout holds the splash until the stored token is read, so the
+ * status here is always "authed" or "guest", never "loading".
  *
- * ADDING A NEW ROLE:
- *   1. Add the role → path mapping to ROLE_ROUTES below
- *   2. Create the folder + _layout.tsx + screens
- * ─────────────────────────────────────────────────────────────
+ * Adding a group (e.g. app/(dashboard)/admin/):
+ *   1. create the folder with its _layout.tsx and screens
+ *   2. add its name to VALID_DASHBOARD_GROUPS
+ *
+ * Roles: the template does no role branching, because roles are server
+ * state, not auth state. If your backend has roles, read the role from
+ * useMe() here and redirect to the matching group.
  */
-
 import { useAuthStore } from "@/stores/dev/auth.store";
+import { useTheme } from "@/theme";
 import { Slot, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
-// ── Role → route mapping ──────────────────────────────────────────────────────
-const ROLE_ROUTES: Record<string, string> = {
-  admin: "/(protected)/admin",
-  user: "/(protected)/user",
-  // Add more roles here:
-  // manager: "/(protected)/manager",
-};
+/** Top-level groups directly under (dashboard) that are valid destinations. */
+const VALID_DASHBOARD_GROUPS = ["user"];
+/** Where signed-in users land when no valid group is in the URL. */
+const DEFAULT_GROUP = "user";
 
-// ─────────────────────────────────────────────────────────────────────────────
-export default function ProtectedLayout() {
-  const { isAuthenticated, user } = useAuthStore();
+export default function DashboardLayout() {
+  const isAuthenticated = useAuthStore((s) => s.status === "authed");
   const segments = useSegments();
   const router = useRouter();
+  const { theme } = useTheme();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -46,23 +43,14 @@ export default function ProtectedLayout() {
       return;
     }
 
-    const role = user?.role ?? "";
-    const targetRoute = ROLE_ROUTES[role];
-    const currentGroup = segments[1]; // e.g. "admin" | "user"
+    const currentGroup = segments[1];
 
-    if (!targetRoute) {
-      // Unknown role — send back to tabs
-      router.replace("/(tabs)/");
-      return;
-    }
-
-    const expectedGroup = targetRoute.split("/").pop(); // "admin" | "user" …
-    if (currentGroup !== expectedGroup) {
-      router.replace(targetRoute as any);
+    if (!currentGroup || !VALID_DASHBOARD_GROUPS.includes(currentGroup)) {
+      router.replace(`/(dashboard)/${DEFAULT_GROUP}` as any);
     } else {
       setReady(true);
     }
-  }, [isAuthenticated, user, segments]);
+  }, [isAuthenticated, segments]);
 
   if (!isAuthenticated || !ready) {
     return (
@@ -71,10 +59,10 @@ export default function ProtectedLayout() {
           flex: 1,
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#fff",
+          backgroundColor: theme.background,
         }}
       >
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }

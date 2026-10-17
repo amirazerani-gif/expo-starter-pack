@@ -169,8 +169,14 @@ export interface components {
                  * @example {
                  *       "message": "The given data was invalid.",
                  *       "errors": {
-                 *         "field": [
-                 *           "The field is invalid."
+                 *         "login": [
+                 *           "The login field is required."
+                 *         ],
+                 *         "password": [
+                 *           "The password field is required."
+                 *         ],
+                 *         "title": [
+                 *           "The title field is required."
                  *         ]
                  *       }
                  *     }

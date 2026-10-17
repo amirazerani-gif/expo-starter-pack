@@ -1,7 +1,12 @@
 /**
  * api/errors.ts
- * One error type for every failed HTTP response. Thrown by the client,
- * caught by TanStack Query, read by hooks / components.
+ * The single error type for failed HTTP responses. The client throws it,
+ * TanStack Query carries it, and hooks and components read it.
+ *
+ * Usage:
+ *   if (isApiError(error) && error.status === 422) {
+ *     setError("email", { message: error.fieldErrors.email });
+ *   }
  */
 
 /** Laravel's standard error body (422 validation, 401, 403, 404, 500...). */
@@ -21,7 +26,7 @@ export class ApiError extends Error {
     this.name = "ApiError";
   }
 
-  /** First message per field — ready for react-hook-form's setError. */
+  /** First message per field, ready for a form's per-field error display. */
   get fieldErrors(): Record<string, string> {
     const out: Record<string, string> = {};
     for (const [field, messages] of Object.entries(this.body?.errors ?? {})) {

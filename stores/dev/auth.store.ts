@@ -1,66 +1,62 @@
 /**
- * stores/auth.store.ts
- * ─────────────────────────────────────────────────────────────
- * Zustand auth store.
+ * stores/dev/auth.store.ts
+ * Auth store for the template, used with the mock backend (`npm run mock`).
  *
- * Shape consumed by app/(protected)/_layout.tsx:
- *   isAuthenticated  — boolean
- *   user.role        — string matching a key in ROLE_ROUTES
+ * Owns client state only: the access token (persisted in SecureStore) and
+ * whether the app knows who is signed in. The user object is server state
+ * and lives in useMe() (hooks/resources/dev/User.r.ts), not here.
  *
- * DEV shortcut: set DEFAULT_AUTH below to skip the login screen
- * and boot straight into a role.
- * ─────────────────────────────────────────────────────────────
+ * Consumers:
+ *  - api/client.ts reads `token` to authenticate requests
+ *  - the root layout calls `hydrate()` once at boot
+ *  - auth hooks call `setSession` / `clearSession`
+ *  - route guards read `status`
+ * It imports nothing from the api layer, which avoids import cycles.
+ *
+ * Connecting a real backend: create stores/prod/auth.store.ts (or edit this
+ * file in place) and update the imports in api/client.ts, lib/queryClient.ts,
+ * the root layout, the guards and the resource hooks.
  */
-
+import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
-import { apiLogin, apiLogout, AuthUser } from "@/api/dev/auth.api";
 
-// ── DEV SHORTCUT ──────────────────────────────────────────────
-// Set to a role string to auto-authenticate on launch, or null
-// to go through the login screen normally.
-//
-//   "admin"  → boots into /(protected)/admin
-//   "user"   → boots into /(protected)/user
-//   null     → shows login screen
-//
-const DEV_AUTO_LOGIN: "admin" | "user" | null = "admin";
+const TOKEN_KEY = "userToken";
 
-const DEV_USERS: Record<string, AuthUser> = {
-  admin: { id: "1", name: "Dev Admin", email: "admin@dev.com", role: "admin" },
-  user: { id: "2", name: "Dev User", email: "user@dev.com", role: "user" },
+/** loading: token not read yet. authed: token present. guest: no token. */
+export type AuthStatus = "loading" | "authed" | "guest";
+
+type AuthState = {
+  token: string | null;
+  status: AuthStatus;
+  /** Reads the stored token. Call once at boot, before rendering routes. */
+  hydrate: () => Promise<void>;
+  /** Persists a new token and marks the user as signed in. */
+  setSession: (token: string) => Promise<void>;
+  /** Signs out locally. Safe to call when already signed out. */
+  clearSession: () => Promise<void>;
 };
-// ─────────────────────────────────────────────────────────────
 
-interface AuthState {
-  isAuthenticated: boolean;
-  user: AuthUser | null;
-  loading: boolean;
-  error: string | null;
+export const useAuthStore = create<AuthState>((set) => ({
+  token: null,
+  status: "loading",
 
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-export const useAuthStore = create<AuthState>()((set) => ({
-  // Auto-login in dev if DEV_AUTO_LOGIN is set
-  isAuthenticated: DEV_AUTO_LOGIN !== null,
-  user: DEV_AUTO_LOGIN ? DEV_USERS[DEV_AUTO_LOGIN] : null,
-  loading: false,
-  error: null,
-
-  login: async (email, password) => {
-    set({ loading: true, error: null });
+  hydrate: async () => {
     try {
-      const user = await apiLogin(email, password);
-      set({ isAuthenticated: true, user, loading: false });
-    } catch (e: any) {
-      set({ error: e.message, loading: false });
+      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      set({ token, status: token ? "authed" : "guest" });
+    } catch {
+      set({ token: null, status: "guest" });
     }
   },
 
-  logout: async () => {
-    set({ loading: true });
-    await apiLogout();
-    set({ isAuthenticated: false, user: null, loading: false, error: null });
+  setSession: async (token) => {
+    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    set({ token, status: "authed" });
+  },
+
+  clearSession: async () => {
+    // Update state first so the UI reacts immediately; storage cleanup follows.
+    set({ token: null, status: "guest" });
+    await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
   },
 }));

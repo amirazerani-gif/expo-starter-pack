@@ -1,3 +1,13 @@
+/**
+ * UI kit showcase
+ * A sample screen that renders every UI primitive (Text, Button, Input,
+ * TextArea, SectionCard) in all its variants, in the current light or dark
+ * theme. Use it to preview the kit while building or restyling components,
+ * and copy the snippets you need into your own screens.
+ *
+ * It has no data or navigation logic, so it is safe to delete in a real app.
+ */
+
 import { Button } from "@/components/ui/button";
 import { Input, TextArea } from "@/components/ui/input";
 import { SectionCard } from "@/components/ui/section";
