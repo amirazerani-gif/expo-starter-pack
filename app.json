@@ -1,14 +1,15 @@
 {
   "expo": {
-    "name": "expo-app-template",
-    "slug": "expo-app-template",
+    "name": "Expo Starter Pack",
+    "slug": "expo-starter-pack",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "expoapptemplate",
+    "scheme": "expostarterpack",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.amirgazerani.expostarterpack"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +19,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.amirgazerani.expoapptemplate"
+      "package": "com.amirgazerani.expostarterpack"
     },
     "web": {
       "bundler": "metro",
