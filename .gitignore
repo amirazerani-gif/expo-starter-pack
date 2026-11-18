@@ -43,3 +43,6 @@ yarn-error.*
 # environment settings
 .env
 .env.local
+
+# upgrade baselines
+/.upgrade
