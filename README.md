@@ -2,7 +2,7 @@
 
 A production-ready Expo starter with a public interface, an auth-gated dashboard, and a typed data layer: **OpenAPI-generated types + TanStack Query resource hooks**, with Zustand reserved for app and UI state only.
 
-> Built on **Expo SDK 57** with the **New Architecture** enabled. Ships with a local mock backend, so it runs end to end before you have a server.
+> Built on **Expo SDK 57** with the **New Architecture** enabled. The SDK 58 upgrade is in progress. Ships with a local mock backend, so it runs end to end before you have a server.
 
 ---
 
@@ -12,7 +12,7 @@ A production-ready Expo starter with a public interface, an auth-gated dashboard
 - **Resource hooks.** One file per API resource (`hooks/resources/`), holding its types, cache keys, queries and mutations. Screens just call hooks.
 - **Caching built in.** TanStack Query provides caching, expiry, refetch on focus and reconnect, retries and pagination.
 - **Auth.** A small Zustand store owns the token (persisted in SecureStore). A route guard protects the `(dashboard)` group.
-- **Global error handling.** One `ApiError` type, one error store, and toasts through `sonner-native`, with per-request opt-out flags.
+- **Global error handling.** One `ApiError` type, one error store, and toasts through `sonner-native`, with per-request opt-out flags. Failed requests are also logged to the console in a structured format (error, status, network error, and message), so you can see what went wrong without digging.
 - **Mock backend.** `npm run mock` serves the demo contract with Prism, so the sample login, dashboard and items list work immediately.
 - **UI kit and theme.** Token-based theme with automatic dark/light mode, plus `Text`, `Input`, `TextArea`, `Button` and `SectionCard`.
 - **Forms.** `react-hook-form`, `zod` and `@hookform/resolvers` are installed for form validation.
