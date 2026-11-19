@@ -30,7 +30,7 @@ interface AppTabBarProps extends ExpoTabBarProps {
 
 export function AppTabBar({
   state,
-  navigation,
+  navigateToTab,
   descriptors,
   extraTabs = [],
 }: AppTabBarProps) {
@@ -142,7 +142,7 @@ export function AppTabBar({
           key={route.key}
           onPress={() => {
             if (isExpandedRef.current) toggleMenu(false);
-            navigation.navigate(route.name);
+            navigateToTab(route.name);
           }}
           style={s.tabButton}
         >
@@ -211,7 +211,12 @@ export function AppTabBar({
             <Animated.View style={{ transform: [{ scale: catBounce }] }}>
               <Pressable onPress={handleCentrePress} style={s.centreBtn}>
                 <Animated.View style={{ transform: [{ rotate: iconRotate }] }}>
-                  <Ionicons name ="grid-outline" color="white" size={18} strokeWidth={2.5} />
+                  <Ionicons
+                    name="grid-outline"
+                    color="white"
+                    size={18}
+                    strokeWidth={2.5}
+                  />
                 </Animated.View>
               </Pressable>
             </Animated.View>
