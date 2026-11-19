@@ -8,13 +8,16 @@ import { useColorScheme } from './useColorScheme';
 
 import Colors from '@/constants/Colors';
 
+
+import type { ComponentProps } from "react";
+
 type ThemeProps = {
   lightColor?: string;
   darkColor?: string;
 };
 
-export type TextProps = ThemeProps & DefaultText['props'];
-export type ViewProps = ThemeProps & DefaultView['props'];
+export type TextProps = ThemeProps & ComponentProps<typeof DefaultText>;
+export type ViewProps = ThemeProps & ComponentProps<typeof DefaultView>;
 
 export function useThemeColor(
   props: { light?: string; dark?: string },

@@ -54,7 +54,9 @@ function ItemsList() {
         </Text>
       }
       ListFooterComponent={
-        isFetchingNextPage ? <ActivityIndicator color={theme.primary} /> : null
+        isFetchingNextPage ? (
+          <ActivityIndicator color={theme.primary} />
+        ) : undefined
       }
       renderItem={({ item }) => (
         <SectionCard borderColor={theme.border}>

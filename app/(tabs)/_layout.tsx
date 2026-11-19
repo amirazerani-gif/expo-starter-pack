@@ -20,7 +20,11 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={22} color={color} />
+            <Ionicons
+              name="home-outline"
+              size={22}
+              color={typeof color === "string" ? color : undefined}
+            />
           ),
         }}
       />
@@ -29,7 +33,11 @@ export default function TabLayout() {
         options={{
           title: "Account",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="person-outline" size={22} color={color} />
+            <Ionicons
+              name="person-outline"
+              size={22}
+              color={typeof color === "string" ? color : undefined}
+            />
           ),
         }}
       />

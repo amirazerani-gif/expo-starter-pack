@@ -29,49 +29,50 @@ interface TextProps extends RNTextProps {
   inverse?: boolean;
 }
 
-export const Text = React.forwardRef<RNText, TextProps>(
-  ({ size, bold, medium, dim, inverse, style, ...props }, ref) => {
-    const { theme } = useTheme();
+export const Text = React.forwardRef<
+  React.ComponentRef<typeof RNText>,
+  TextProps
+>(({ size, bold, medium, dim, inverse, style, ...props }, ref) => {
+  const { theme } = useTheme();
 
-    const flat = StyleSheet.flatten(style) ?? {};
+  const flat = StyleSheet.flatten(style) ?? {};
 
-    const baseSize = SIZE_MAP[size ?? "md"];
-    const scaled = moderateScale(baseSize, 0.3);
+  const baseSize = SIZE_MAP[size ?? "md"];
+  const scaled = moderateScale(baseSize, 0.3);
 
-    // Resolve font size — inline style wins over size prop
-    const resolvedFontSize: number =
-      typeof flat.fontSize === "number" ? flat.fontSize : scaled;
+  // Resolve font size — inline style wins over size prop
+  const resolvedFontSize: number =
+    typeof flat.fontSize === "number" ? flat.fontSize : scaled;
 
-    // Line height tracks resolved font size unless explicitly overridden
-    const resolvedLineHeight: number =
-      typeof flat.lineHeight === "number"
-        ? flat.lineHeight
-        : Math.round(resolvedFontSize * LINE_HEIGHT_MULTIPLIER);
+  // Line height tracks resolved font size unless explicitly overridden
+  const resolvedLineHeight: number =
+    typeof flat.lineHeight === "number"
+      ? flat.lineHeight
+      : Math.round(resolvedFontSize * LINE_HEIGHT_MULTIPLIER);
 
-    const color = inverse
-      ? theme.textInverse
-      : dim
-        ? theme.textSecondary
-        : theme.textPrimary;
+  const color = inverse
+    ? theme.textInverse
+    : dim
+      ? theme.textSecondary
+      : theme.textPrimary;
 
-    // fontFamily comes entirely from style — never hardcoded here
-    const resolvedStyle = {
-      color: typeof flat.color === "string" ? flat.color : color,
-      ...flat,
-      // Stamp last so flat never overwrites the computed values
-      fontSize: resolvedFontSize,
-      lineHeight: resolvedLineHeight,
-    };
+  // fontFamily comes entirely from style — never hardcoded here
+  const resolvedStyle = {
+    color: typeof flat.color === "string" ? flat.color : color,
+    ...flat,
+    // Stamp last so flat never overwrites the computed values
+    fontSize: resolvedFontSize,
+    lineHeight: resolvedLineHeight,
+  };
 
-    return (
-      <RNText
-        ref={ref}
-        allowFontScaling={false}
-        style={resolvedStyle}
-        {...props}
-      />
-    );
-  },
-);
+  return (
+    <RNText
+      ref={ref}
+      allowFontScaling={false}
+      style={resolvedStyle}
+      {...props}
+    />
+  );
+});
 
 Text.displayName = "Text";
