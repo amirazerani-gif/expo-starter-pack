@@ -153,10 +153,49 @@ paths:
                 data:
                   - { id: 1, title: First item, description: Hello from the mock server }
                   - { id: 2, title: Second item, description: null }
+                  - { id: 3, title: Third item, description: Sample description for item 3 }
+                  - { id: 4, title: Fourth item, description: Sample description for item 4 }
+                  - { id: 5, title: Fifth item, description: Sample description for item 5 }
+                  - { id: 6, title: Sixth item, description: Sample description for item 6 }
+                  - { id: 7, title: Seventh item, description: Sample description for item 7 }
+                  - { id: 8, title: Eighth item, description: Sample description for item 8 }
+                  - { id: 9, title: Ninth item, description: Sample description for item 9 }
+                  - { id: 10, title: Tenth item, description: Sample description for item 10 }
+                  - { id: 11, title: Eleventh item, description: Sample description for item 11 }
+                  - { id: 12, title: Twelfth item, description: Sample description for item 12 }
+                  - { id: 13, title: Thirteenth item, description: Sample description for item 13 }
+                  - { id: 14, title: Fourteenth item, description: Sample description for item 14 }
+                  - { id: 15, title: Fifteenth item, description: Sample description for item 15 }
+                  - { id: 16, title: Sixteenth item, description: Sample description for item 16 }
+                  - { id: 17, title: Seventeenth item, description: Sample description for item 17 }
+                  - { id: 18, title: Eighteenth item, description: Sample description for item 18 }
+                  - { id: 19, title: Nineteenth item, description: Sample description for item 19 }
+                  - { id: 20, title: Twentieth item, description: Sample description for item 20 }
+                  - { id: 21, title: Twenty-first item, description: Sample description for item 21 }
+                  - { id: 22, title: Twenty-second item, description: Sample description for item 22 }
+                  - { id: 23, title: Twenty-third item, description: Sample description for item 23 }
+                  - { id: 24, title: Twenty-fourth item, description: Sample description for item 24 }
+                  - { id: 25, title: Twenty-fifth item, description: Sample description for item 25 }
+                  - { id: 26, title: Twenty-sixth item, description: Sample description for item 26 }
+                  - { id: 27, title: Twenty-seventh item, description: Sample description for item 27 }
+                  - { id: 28, title: Twenty-eighth item, description: Sample description for item 28 }
+                  - { id: 29, title: Twenty-ninth item, description: Sample description for item 29 }
+                  - { id: 30, title: Thirtieth item, description: Sample description for item 30 }
                 links: { first: "/v1/items?page=1", last: "/v1/items?page=1", prev: null, next: null }
                 meta: { current_page: 1, from: 1, last_page: 1, per_page: 15, to: 2, total: 2 }
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: Server Error
     post:
       operationId: createItem
       tags: [Items]
