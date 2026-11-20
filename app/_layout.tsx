@@ -53,7 +53,9 @@ NetInfo.configure({
 });
 
 export { ErrorBoundary } from "expo-router";
-export const unstable_settings = { initialRouteName: "(tabs)" };
+export const unstable_settings = {
+  anchor: "(tabs)",
+};
 
 SplashScreen.preventAutoHideAsync();
 
