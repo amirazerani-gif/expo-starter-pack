@@ -1,75 +1,58 @@
 /**
  * hooks/resources/dev/Items.r.ts
  * Worked example of a resource: one file per API resource, holding its types,
- * key factory, query options, and query and mutation hooks. Copy this file
- * as the starting point for a new resource.
+ * query options, and query and mutation hooks. Copy this file as the
+ * starting point for a new resource.
  *
- *   Key factory   itemKeys is the single source of cache keys, so
- *                 invalidation never relies on hand-typed arrays.
- *   Options       itemsOptions / itemOptions can be reused outside hooks
- *                 (prefetching, route loaders, queryClient.fetchQuery).
- *   Pagination    useItems() flattens an infinite list through unwrapPage.
- *   Mutations     create / update / delete invalidate affected queries
- *                 instead of editing the cache by hand.
+ *   Keys          derived from method + path by $api, never hand-written.
+ *                 Invalidate with $api.queryOptions("get", "/v1/items").queryKey:
+ *                 it prefix-matches the list, and a spec change breaks the build.
+ *   Options       itemOptions can be reused outside hooks (prefetching,
+ *                 route loaders, queryClient.fetchQuery).
+ *   Pagination    useItems() flattens an infinite list through `select`.
+ *                 A path is either plain or infinite, never both with the
+ *                 same params, because both share one key.
+ *   Mutations     invalidate affected queries instead of editing the cache.
  *
  * Usage:
  *   const { items, fetchNextPage, hasNextPage } = useItems();
  *   const { mutate: createItem } = useCreateItem();
  */
 import { client, unwrap, unwrapMessage } from "@/api/client";
-import { flatPages, unwrapPage } from "@/api/pagination";
+import { nextLaravelPage } from "@/api/pagination";
+import { $api } from "@/api/query";
 import type { JsonBody, ResData, ResItem } from "@/api/types";
-import {
-  infiniteQueryOptions,
-  queryOptions,
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export type Item = ResItem<"/v1/items">;
 export type ItemDetail = ResData<"/v1/items/{item}">;
 
-export const itemKeys = {
-  all: ["items"] as const,
-  lists: () => [...itemKeys.all, "list"] as const,
-  detail: (id: number) => [...itemKeys.all, "detail", id] as const,
-};
-
-export const itemsOptions = () =>
-  infiniteQueryOptions({
-    queryKey: itemKeys.lists(),
-    queryFn: ({ pageParam, signal }) =>
-      unwrapPage(
-        client.GET("/v1/items", {
-          params: { query: { page: pageParam } },
-          signal,
-        }),
-      ),
-    initialPageParam: 1,
-    getNextPageParam: (last) => last.nextPage ?? undefined,
-    meta: { reportErrors: true },
-  });
-
-export const itemOptions = (id: number) =>
-  queryOptions({
-    queryKey: itemKeys.detail(id),
-    queryFn: ({ signal }) =>
-      unwrap(
-        client.GET("/v1/items/{item}", {
-          params: { path: { item: id } },
-          signal,
-        }),
-      ),
-    meta: { reportErrors: true },
-  });
+const NO_ITEMS: Item[] = [];
 
 /** Infinite list with every loaded page flattened into `items`. */
 export function useItems() {
-  const query = useInfiniteQuery(itemsOptions());
-  return { ...query, items: flatPages(query.data) };
+  const query = $api.useInfiniteQuery(
+    "get",
+    "/v1/items",
+    {},
+    {
+      pageParamName: "page",
+      initialPageParam: 1,
+      getNextPageParam: nextLaravelPage,
+      select: (data) => data.pages.flatMap((page) => page.data),
+      meta: { reportErrors: true },
+    },
+  );
+  return { ...query, items: query.data ?? NO_ITEMS };
 }
+
+export const itemOptions = (id: number) =>
+  $api.queryOptions(
+    "get",
+    "/v1/items/{item}",
+    { params: { path: { item: id } } },
+    { select: (res) => res.data, meta: { reportErrors: true } },
+  );
 
 /** One item. Stays idle until `id` is defined. */
 export function useItem(id: number | undefined) {
@@ -82,7 +65,9 @@ export function useCreateItem() {
     mutationFn: async (body: JsonBody<"/v1/items", "post">) =>
       unwrap(client.POST("/v1/items", { body })),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: itemKeys.lists() }),
+      queryClient.invalidateQueries({
+        queryKey: $api.queryOptions("get", "/v1/items").queryKey,
+      }),
     meta: { skipGlobalError: true },
   });
 }
@@ -97,8 +82,14 @@ export function useUpdateItem(id: number) {
           body,
         }),
       ),
-    // Refreshes both the list and the detail.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: itemKeys.all }),
+    // Refreshes both the list and this item's detail.
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: $api.queryOptions("get", "/v1/items").queryKey,
+        }),
+        queryClient.invalidateQueries({ queryKey: itemOptions(id).queryKey }),
+      ]),
     meta: { skipGlobalError: true },
   });
 }
@@ -112,8 +103,10 @@ export function useDeleteItem() {
       ),
     onSuccess: (_msg, id) => {
       // The deleted detail is dropped rather than refetched, which would 404.
-      queryClient.removeQueries({ queryKey: itemKeys.detail(id) });
-      return queryClient.invalidateQueries({ queryKey: itemKeys.lists() });
+      queryClient.removeQueries({ queryKey: itemOptions(id).queryKey });
+      return queryClient.invalidateQueries({
+        queryKey: $api.queryOptions("get", "/v1/items").queryKey,
+      });
     },
   });
 }

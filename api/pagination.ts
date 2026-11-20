@@ -1,33 +1,24 @@
 /**
  * api/pagination.ts
- * Pagination helpers for infinite lists, for standard Laravel page-number
- * pagination (`data` plus `meta.current_page` / `meta.last_page`).
+ * Paging for infinite lists, for standard Laravel page-number pagination
+ * (`data` plus `meta.current_page` / `meta.last_page`).
  *
- *   unwrapPage  turns one response into { items, nextPage }
- *   flatPages   flattens an infinite query's pages into a single array
+ *   nextLaravelPage  getNextPageParam for $api.useInfiniteQuery
  *
  * Usage (see hooks/resources/dev/Items.r.ts):
- *   queryFn: ({ pageParam }) => unwrapPage(client.GET("/v1/items", ...))
- *   getNextPageParam: (last) => last.nextPage ?? undefined
+ *   $api.useInfiniteQuery("get", "/v1/items", {}, {
+ *     pageParamName: "page",
+ *     initialPageParam: 1,
+ *     getNextPageParam: nextLaravelPage,
+ *     select: (data) => data.pages.flatMap((page) => page.data),
+ *   });
  *
- * If your API pages differently (cursor, offset...), change this file; it is
- * the only place that knows the paging shape.
+ * If your API pages differently (cursor, offset...), change this file and
+ * the pageParamName; it is the only place that knows the paging shape.
  */
-type LaravelPage<T> = {
-  data: T[];
+export function nextLaravelPage(last: {
   meta: { current_page: number; last_page: number };
-};
-
-export async function unwrapPage<T>(
-  request: Promise<{ data?: LaravelPage<T> }>,
-) {
-  const body = (await request).data as LaravelPage<T>;
-  const { current_page, last_page } = body.meta;
-  return {
-    items: body.data,
-    nextPage: current_page < last_page ? current_page + 1 : null,
-  };
+}): number | undefined {
+  const { current_page, last_page } = last.meta;
+  return current_page < last_page ? current_page + 1 : undefined;
 }
-
-export const flatPages = <T>(data?: { pages: { items: T[] }[] }): T[] =>
-  data?.pages.flatMap((page) => page.items) ?? [];

@@ -6,32 +6,22 @@
  *   useMe()        the current user; only runs while authenticated
  *   useUpdateMe()  partial profile update; refreshes useMe() on success
  *
- * Usage:
- *   const { data: me, isLoading } = useMe();
+ * The query key comes from $api (api/query.ts), derived from method and
+ * path, so there is no key factory to maintain.
  *
  * useUpdateMe sets `skipGlobalError` because it feeds a form with inline
  * errors. useMe sets `reportErrors` because a failed fetch has no form to
  * report into and should be visible.
  */
 import { client, unwrap } from "@/api/client";
+import { $api } from "@/api/query";
 import type { JsonBody } from "@/api/types";
 import { useAuthStore } from "@/stores/dev/auth.store";
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-
-export const userKeys = {
-  all: ["user"] as const,
-  me: () => [...userKeys.all, "me"] as const,
-};
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const meOptions = () =>
-  queryOptions({
-    queryKey: userKeys.me(),
-    queryFn: ({ signal }) => unwrap(client.GET("/v1/me", { signal })),
+  $api.queryOptions("get", "/v1/me", undefined, {
+    select: (res) => res.data, // strips the { message, data } envelope
     meta: { reportErrors: true },
   });
 
@@ -46,7 +36,8 @@ export function useUpdateMe() {
   return useMutation({
     mutationFn: async (body: JsonBody<"/v1/me", "patch">) =>
       unwrap(client.PATCH("/v1/me", { body })),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.me() }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: meOptions().queryKey }),
     meta: { skipGlobalError: true },
   });
 }
