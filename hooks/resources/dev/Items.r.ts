@@ -18,11 +18,10 @@
  *   const { items, fetchNextPage, hasNextPage } = useItems();
  *   const { mutate: createItem } = useCreateItem();
  */
-import { client, unwrap, unwrapMessage } from "@/api/client";
 import { nextLaravelPage } from "@/api/pagination";
 import { $api } from "@/api/query";
-import type { JsonBody, ResData, ResItem } from "@/api/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ResData, ResItem } from "@/api/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export type Item = ResItem<"/v1/items">;
 export type ItemDetail = ResData<"/v1/items/{item}">;
@@ -61,9 +60,7 @@ export function useItem(id: number | undefined) {
 
 export function useCreateItem() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (body: JsonBody<"/v1/items", "post">) =>
-      unwrap(client.POST("/v1/items", { body })),
+  return $api.useMutation("post", "/v1/items", {
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: $api.queryOptions("get", "/v1/items").queryKey,
@@ -72,38 +69,33 @@ export function useCreateItem() {
   });
 }
 
-export function useUpdateItem(id: number) {
+/** The item id goes at the call site: mutate({ params: { path: { item: id } }, body }). */
+export function useUpdateItem() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (body: JsonBody<"/v1/items/{item}", "put">) =>
-      unwrap(
-        client.PUT("/v1/items/{item}", {
-          params: { path: { item: id } },
-          body,
-        }),
-      ),
+  return $api.useMutation("put", "/v1/items/{item}", {
     // Refreshes both the list and this item's detail.
-    onSuccess: () =>
+    onSuccess: (_res, variables) =>
       Promise.all([
         queryClient.invalidateQueries({
           queryKey: $api.queryOptions("get", "/v1/items").queryKey,
         }),
-        queryClient.invalidateQueries({ queryKey: itemOptions(id).queryKey }),
+        queryClient.invalidateQueries({
+          queryKey: itemOptions(variables.params.path.item).queryKey,
+        }),
       ]),
     meta: { skipGlobalError: true },
   });
 }
 
+/** mutate({ params: { path: { item: id } } }) */
 export function useDeleteItem() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: number) =>
-      unwrapMessage(
-        client.DELETE("/v1/items/{item}", { params: { path: { item: id } } }),
-      ),
-    onSuccess: (_msg, id) => {
+  return $api.useMutation("delete", "/v1/items/{item}", {
+    onSuccess: (_res, variables) => {
       // The deleted detail is dropped rather than refetched, which would 404.
-      queryClient.removeQueries({ queryKey: itemOptions(id).queryKey });
+      queryClient.removeQueries({
+        queryKey: itemOptions(variables.params.path.item).queryKey,
+      });
       return queryClient.invalidateQueries({
         queryKey: $api.queryOptions("get", "/v1/items").queryKey,
       });

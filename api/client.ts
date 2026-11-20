@@ -95,17 +95,6 @@ export async function unwrap<T>(
 }
 
 /**
- * For endpoints that return no payload (logout, change password...):
- * resolves with the server's `message`, ready to show in a toast.
- */
-export async function unwrapMessage(
-  request: Promise<{ data?: { message?: string | null } }>,
-): Promise<string> {
-  const { data } = await request;
-  return data?.message ?? "";
-}
-
-/**
  * Builds a multipart/form-data request for file uploads. The generated type
  * for a file field is `string`, which a React Native file object is not, so
  * the typed body is bypassed and the FormData is assembled here.

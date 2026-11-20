@@ -7,6 +7,13 @@
  * toasts, form errors) belong at the call site:
  *   login(values, { onSuccess, onError })
  *
+ * Two styles live here on purpose:
+ *  - useLogout uses $api.useMutation, because its variables are the request
+ *    itself. Call it as logout().
+ *  - useLogin stays hand-written (useMutation + client + unwrap), because it
+ *    shapes the request: it adds `device_name`, which $api.useMutation
+ *    cannot express. Use this style whenever a hook transforms its input.
+ *
  * Error handling: useLogin sets `skipGlobalError` because the login form
  * shows 4xx errors inline. Logout has no form, so it uses the default toast.
  * 5xx and network failures always toast.
@@ -16,7 +23,8 @@
  * auth store and calls your own endpoints, then point your screens at it.
  * The `.r.ts` suffix marks a file as a data resource.
  */
-import { client, unwrap, unwrapMessage } from "@/api/client";
+import { client, unwrap } from "@/api/client";
+import { $api } from "@/api/query";
 import type { JsonBody } from "@/api/types";
 import { useAuthStore } from "@/stores/dev/auth.store";
 import { useMutation } from "@tanstack/react-query";
@@ -42,8 +50,7 @@ export function useLogin() {
 
 /** Revokes the token server-side. The local session is cleared even if the request fails. */
 export function useLogout() {
-  return useMutation({
-    mutationFn: async () => unwrapMessage(client.POST("/v1/auth/logout")),
+  return $api.useMutation("post", "/v1/auth/logout", {
     onSettled: () => useAuthStore.getState().clearSession(),
   });
 }
