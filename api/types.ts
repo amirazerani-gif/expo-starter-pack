@@ -34,3 +34,14 @@ export type ResItem<
   P extends keyof paths,
   M extends keyof paths[P] = "get" & keyof paths[P],
 > = ResData<P, M> extends (infer I)[] ? I : never;
+
+/**
+ * QueryParamName<"/v1/items">   query param names of an endpoint, to check a
+ *                               string option (like a page param) against the spec.
+ */
+export type QueryParamName<
+  P extends keyof paths,
+  M extends keyof paths[P] = "get" & keyof paths[P],
+> = paths[P][M] extends { parameters: { query?: infer Q } }
+  ? keyof NonNullable<Q> & string
+  : never;

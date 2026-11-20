@@ -20,7 +20,7 @@
  */
 import { nextLaravelPage } from "@/api/pagination";
 import { $api } from "@/api/query";
-import type { ResData, ResItem } from "@/api/types";
+import type { QueryParamName, ResData, ResItem } from "@/api/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export type Item = ResItem<"/v1/items">;
@@ -35,7 +35,7 @@ export function useItems() {
     "/v1/items",
     {},
     {
-      pageParamName: "page",
+      pageParamName: "page" satisfies QueryParamName<"/v1/items">,
       initialPageParam: 1,
       getNextPageParam: nextLaravelPage,
       select: (data) => data.pages.flatMap((page) => page.data),

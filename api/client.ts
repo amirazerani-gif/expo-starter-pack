@@ -99,7 +99,10 @@ export async function unwrap<T>(
  * for a file field is `string`, which a React Native file object is not, so
  * the typed body is bypassed and the FormData is assembled here.
  *
- *   client.POST("/v1/me/avatar", multipart({ avatar: file }))
+ *   // with $api.useMutation("post", "/v1/me/avatar"):
+ *   mutate(multipart({ avatar: file }))
+ *   // when the endpoint also has path params:
+ *   mutate({ params: { path: { id } }, ...multipart({ avatar: file }) })
  */
 export type RNFile = { uri: string; name: string; type: string };
 
