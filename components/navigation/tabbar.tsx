@@ -142,7 +142,7 @@ export function AppTabBar({
           key={route.key}
           onPress={() => {
             if (isExpandedRef.current) toggleMenu(false);
-            navigateToTab(route.name);
+            navigateToTab(route.key);
           }}
           style={s.tabButton}
         >
@@ -166,7 +166,7 @@ export function AppTabBar({
         </Pressable>
       );
     },
-    [state.index, state.routes, descriptors, toggleMenu, navigation],
+    [state.index, state.routes, descriptors, toggleMenu, navigateToTab],
   );
 
   const expandHeight = expandAnim.interpolate({
