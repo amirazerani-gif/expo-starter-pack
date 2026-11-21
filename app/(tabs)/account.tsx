@@ -1,25 +1,18 @@
 /**
  * app/(tabs)/account.tsx
- * Public home screen that shows the app's data flow end to end.
- *
- * - The account card reads the auth status (client state, auth store) and
- *   offers "Sign in" for guests or "Open dashboard" when signed in.
- * - The items list reads server state through useItems() (TanStack Query):
- *   cached, paginated and refreshable. It only mounts while signed in,
- *   because the endpoint requires a token.
- *
- * Use it as a reference for combining both kinds of state on one screen.
+ * Interim screen: account card plus the items list. It is replaced by the
+ * Data screen in the example-app redesign.
  */
 import { Button } from "@/components/ui/button";
-import { SectionCard } from "@/components/ui/section";
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { TAB_BAR_CLEARANCE } from "@/components/navigation/tabbar";
 import { useItems } from "@/hooks/resources/dev/Items.r";
 import { useAuthStore } from "@/stores/dev/auth.store";
 import { useTheme } from "@/theme";
 import { router } from "expo-router";
 import { ActivityIndicator, FlatList, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { verticalScale } from "react-native-size-matters";
 
 /** Paginated list of items; loads the next page when scrolled to the end. */
 function ItemsList() {
@@ -46,7 +39,7 @@ function ItemsList() {
       onEndReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
       contentContainerStyle={{
         gap: spacing.sm,
-        paddingBottom: insets.bottom + verticalScale(100),
+        paddingBottom: insets.bottom + TAB_BAR_CLEARANCE,
       }}
       ListEmptyComponent={
         <Text size="sm" dim>
@@ -59,14 +52,14 @@ function ItemsList() {
         ) : undefined
       }
       renderItem={({ item }) => (
-        <SectionCard borderColor={theme.border}>
+        <Card>
           <Text medium>{item.title}</Text>
           {item.description && (
             <Text size="sm" dim>
               {item.description}
             </Text>
           )}
-        </SectionCard>
+        </Card>
       )}
     />
   );
@@ -74,7 +67,6 @@ function ItemsList() {
 
 export default function AccountScreen() {
   const { theme, spacing } = useTheme();
-  const insets = useSafeAreaInsets();
   const isAuthenticated = useAuthStore((s) => s.status === "authed");
 
   return (
@@ -82,13 +74,12 @@ export default function AccountScreen() {
       style={{
         flex: 1,
         backgroundColor: theme.background,
-        paddingHorizontal: spacing.md,
-        paddingTop: insets.top + spacing.md,
+        padding: spacing.md,
         gap: spacing.md,
       }}
     >
-      <SectionCard borderColor={theme.border}>
-        <Text size="lg" medium>
+      <Card>
+        <Text size="lg" bold>
           Account
         </Text>
         <Text size="sm" dim style={{ marginBottom: spacing.sm }}>
@@ -107,9 +98,9 @@ export default function AccountScreen() {
             onPress={() => router.push("/(auth)/login")}
           />
         )}
-      </SectionCard>
+      </Card>
 
-      <Text size="lg" medium>
+      <Text size="lg" bold>
         Items
       </Text>
 

@@ -49,14 +49,14 @@ export default function LoginScreen() {
         backgroundColor: theme.background,
       }}
     >
-      <Text size="xl" medium>
+      <Text size="xl" bold>
         Sign in
       </Text>
 
       <Input
         label="Email"
         placeholder="name@example.com"
-        iconName="mail-outline"
+        leftIcon="mail-outline"
         value={login}
         onChangeText={setLogin}
         keyboardType="email-address"
@@ -67,7 +67,7 @@ export default function LoginScreen() {
       <Input
         label="Password"
         placeholder="Your password"
-        iconName="lock-closed-outline"
+        leftIcon="lock-closed-outline"
         showPasswordToggle
         secureTextEntry
         value={password}

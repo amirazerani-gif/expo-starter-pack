@@ -1,30 +1,44 @@
 /**
- * components/ui/Text.tsx
+ * components/ui/text.tsx
+ * ─────────────────────────────────────────────────────────────
+ * The app's text. Font, weights and sizes come from the global
+ * typography config (theme/typography.ts); color comes from the theme.
+ *
+ *   <Text>Body</Text>
+ *   <Text size="xl" bold>Title</Text>
+ *   <Text size="sm" dim>Secondary</Text>
+ *   <Text inverse>On a primary background</Text>
+ *   <Text weight="semibold">Explicit weight</Text>
+ *
+ * Props   size     xs | sm | md | lg | xl | xxl (default md)
+ *         weight   regular | medium | semibold | bold
+ *         family   a family from fontFamilies (default: typography.defaultFamily)
+ *         medium, semibold, bold   shortcuts for weight
+ *         dim      secondary text color
+ *         inverse  text color for primary backgrounds
+ * A `color`, `fontSize`, `lineHeight` or `fontFamily` in `style` wins.
+ * ─────────────────────────────────────────────────────────────
  */
-
-import { useTheme } from "@/theme";
+import {
+  fontFamilyOf,
+  scaledFont,
+  typography,
+  useTheme,
+  type FontFamily,
+  type FontWeight,
+  type TextSize,
+} from "@/theme";
 import React from "react";
 import type { TextProps as RNTextProps } from "react-native";
 import { Text as RNText, StyleSheet } from "react-native";
-import { moderateScale } from "react-native-size-matters";
-
-const SIZE_MAP = {
-  xs: 11,
-  sm: 13,
-  md: 15,
-  lg: 18,
-  xl: 22,
-  xxl: 28,
-} as const;
-
-const LINE_HEIGHT_MULTIPLIER = 1.45;
-
-type SizeKey = keyof typeof SIZE_MAP;
 
 interface TextProps extends RNTextProps {
-  size?: SizeKey;
-  bold?: boolean;
+  size?: TextSize;
+  weight?: FontWeight;
+  family?: FontFamily;
   medium?: boolean;
+  semibold?: boolean;
+  bold?: boolean;
   dim?: boolean;
   inverse?: boolean;
 }
@@ -32,47 +46,65 @@ interface TextProps extends RNTextProps {
 export const Text = React.forwardRef<
   React.ComponentRef<typeof RNText>,
   TextProps
->(({ size, bold, medium, dim, inverse, style, ...props }, ref) => {
-  const { theme } = useTheme();
+>(
+  (
+    {
+      size = "md",
+      weight,
+      family,
+      medium,
+      semibold,
+      bold,
+      dim,
+      inverse,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
+    const { theme } = useTheme();
 
-  const flat = StyleSheet.flatten(style) ?? {};
+    // An undefined value in `style` must not override the computed one.
+    const {
+      color: styleColor,
+      fontSize: styleFontSize,
+      lineHeight: styleLineHeight,
+      fontFamily: styleFontFamily,
+      ...rest
+    } = StyleSheet.flatten(style) ?? {};
 
-  const baseSize = SIZE_MAP[size ?? "md"];
-  const scaled = moderateScale(baseSize, 0.3);
+    const fontSize =
+      typeof styleFontSize === "number" ? styleFontSize : scaledFont(size);
+    const lineHeight =
+      typeof styleLineHeight === "number"
+        ? styleLineHeight
+        : Math.round(fontSize * typography.lineHeight);
 
-  // Resolve font size — inline style wins over size prop
-  const resolvedFontSize: number =
-    typeof flat.fontSize === "number" ? flat.fontSize : scaled;
+    const themed = inverse
+      ? theme.textInverse
+      : dim
+        ? theme.textSecondary
+        : theme.textPrimary;
 
-  // Line height tracks resolved font size unless explicitly overridden
-  const resolvedLineHeight: number =
-    typeof flat.lineHeight === "number"
-      ? flat.lineHeight
-      : Math.round(resolvedFontSize * LINE_HEIGHT_MULTIPLIER);
+    const resolvedWeight: FontWeight | undefined =
+      weight ??
+      (bold ? "bold" : semibold ? "semibold" : medium ? "medium" : undefined);
 
-  const color = inverse
-    ? theme.textInverse
-    : dim
-      ? theme.textSecondary
-      : theme.textPrimary;
-
-  // fontFamily comes entirely from style — never hardcoded here
-  const resolvedStyle = {
-    color: typeof flat.color === "string" ? flat.color : color,
-    ...flat,
-    // Stamp last so flat never overwrites the computed values
-    fontSize: resolvedFontSize,
-    lineHeight: resolvedLineHeight,
-  };
-
-  return (
-    <RNText
-      ref={ref}
-      allowFontScaling={false}
-      style={resolvedStyle}
-      {...props}
-    />
-  );
-});
+    return (
+      <RNText
+        ref={ref}
+        allowFontScaling={false}
+        {...props}
+        style={{
+          ...rest,
+          color: typeof styleColor === "string" ? styleColor : themed,
+          fontFamily: styleFontFamily ?? fontFamilyOf(resolvedWeight, family),
+          fontSize,
+          lineHeight,
+        }}
+      />
+    );
+  },
+);
 
 Text.displayName = "Text";

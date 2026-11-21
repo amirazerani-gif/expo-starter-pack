@@ -15,7 +15,7 @@
  * top-level route groups as <Stack.Screen /> entries below.
  */
 import { ErrorToastListener } from "@/hooks/core/useErrorListener";
-import { appFonts } from "@/lib/fonts";
+import { appFonts } from "@/theme";
 import { queryClient, useAppFocus } from "@/lib/queryClient";
 import { useAuthStore } from "@/stores/dev/auth.store";
 import NetInfo from "@react-native-community/netinfo";

@@ -7,7 +7,7 @@
  * Use this screen as the starting point for your own dashboard content.
  */
 import { Button } from "@/components/ui/button";
-import { SectionCard } from "@/components/ui/section";
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useLogout } from "@/hooks/resources/dev/Auth.r";
 import { useMe } from "@/hooks/resources/dev/User.r";
@@ -31,11 +31,11 @@ export default function UserHome() {
         gap: spacing.md,
       }}
     >
-      <Text size="xl" medium>
+      <Text size="xl" bold>
         Dashboard
       </Text>
 
-      <SectionCard borderColor={theme.border}>
+      <Card>
         {isLoading ? (
           <ActivityIndicator color={theme.primary} />
         ) : (
@@ -46,7 +46,7 @@ export default function UserHome() {
             </Text>
           </>
         )}
-      </SectionCard>
+      </Card>
 
       <Button
         title="Sign out"
