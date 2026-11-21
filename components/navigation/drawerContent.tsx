@@ -13,7 +13,7 @@
  * It reads the dev resource hooks and auth store: when you connect a real
  * backend, point these imports at your prod counterparts.
  */
-import { Avatar } from "./avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useLogout } from "@/hooks/resources/dev/Auth.r";

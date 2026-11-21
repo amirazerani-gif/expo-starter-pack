@@ -24,7 +24,10 @@ export const CONTROL_BORDER = 1;
 /** Opacity of a disabled control. */
 export const DISABLED_OPACITY = 0.5;
 /** Opacity of a pressed control. */
+/** Opacity of a pressed control. */
 export const PRESSED_OPACITY = 0.8;
+/** Dim layer behind modals and sheets. */
+export const OVERLAY_COLOR = "rgba(0,0,0,0.5)";
 /** Platform minimum touch target; controls extend their hit area to it. */
 const MIN_TOUCH = 44;
 

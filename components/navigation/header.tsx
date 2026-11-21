@@ -15,7 +15,7 @@
  *   back   true or false to force the back button; omitted, it shows when the
  *          router has history to go back to.
  */
-import { Avatar } from "./avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Text } from "@/components/ui/text";
 import { useMe } from "@/hooks/resources/dev/User.r";
 import { useAuthStore } from "@/stores/dev/auth.store";
