@@ -101,7 +101,7 @@ export function DrawerContent({ links, onClose }: DrawerContentProps) {
           </View>
           <Button
             title="Open dashboard"
-            onPress={() => go("/(dashboard)/user")}
+            onPress={() => go("/(dashboard)/dev")}
           />
           <Button
             title="Sign out"

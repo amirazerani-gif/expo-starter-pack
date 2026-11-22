@@ -36,7 +36,7 @@ export default function LoginScreen() {
   const generalError = inline && !hasFieldError ? inline.message : null;
 
   useEffect(() => {
-    if (isAuthenticated) router.replace("/(dashboard)/user");
+    if (isAuthenticated) router.replace("/(dashboard)/dev");
   }, [isAuthenticated]);
 
   return (

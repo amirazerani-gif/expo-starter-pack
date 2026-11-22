@@ -74,7 +74,7 @@ export function AppHeader({ title, back }: AppHeaderProps) {
 
         {isAuthenticated ? (
           <Pressable
-            onPress={() => router.push("/(dashboard)/user")}
+            onPress={() => router.push("/(dashboard)/dev")}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Open dashboard"

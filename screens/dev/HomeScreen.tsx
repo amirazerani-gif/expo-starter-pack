@@ -124,7 +124,7 @@ export default function HomeScreen() {
           <Button
             title="Open the demo dashboard"
             rightIcon="arrow-forward"
-            onPress={() => router.push("/(dashboard)/user")}
+            onPress={() => router.push("/(dashboard)/dev")}
           />
         ) : (
           <Button

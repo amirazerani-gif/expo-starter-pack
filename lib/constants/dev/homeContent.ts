@@ -75,7 +75,7 @@ export const STRUCTURE = `app/               routes only: layouts, guards, thin 
   (tabs)/          the public tabs: Home and Data (thin route files)
   (auth)/          login
   (dashboard)/     the signed-in area, guarded by _layout.tsx
-    test/          the demo mini app (example only)
+    dev/           the demo mini app (example only)
 screens/
   dev/             the Home and Data screens (example only)
 components/
@@ -130,10 +130,10 @@ export const DEMO_DASHBOARD = {
 export const SAFE_TO_DELETE = {
   title: "Safe to delete",
   text: "The guide you are reading and the demo dashboard are example-only. Each lives in its own folder, so removing them takes one go and nothing else depends on them.",
-  paths: `screens/dev/              the Home and Data screens
+  paths: `screens/dev/              the Home, Data and dashboard screens
 components/dev/           the guide's building blocks and live examples
 lib/constants/dev/        the guide's text
-app/(dashboard)/test/     the demo mini app`,
+app/(dashboard)/dev/      the demo mini app routes`,
   note: "Afterwards, point app/(tabs)/index.tsx and the second tab at your own screens. The UI kit in components/ui, the navigation shell and the data layer stay.",
 };
 

@@ -126,7 +126,7 @@ export default function DataScreen() {
           }
           rightIcon="arrow-forward"
           onPress={() =>
-            router.push(isAuthenticated ? "/(dashboard)/user" : "/(auth)/login")
+            router.push(isAuthenticated ? "/(dashboard)/dev" : "/(auth)/login")
           }
         />
       </Card>

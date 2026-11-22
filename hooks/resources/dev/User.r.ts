@@ -3,8 +3,8 @@
  * The signed-in user ("me"). This is server state, so it lives in TanStack
  * Query rather than in the auth store.
  *
- *   useMe()        the current user; only runs while authenticated
- *   useUpdateMe()  partial profile update; refreshes useMe() on success
+ *   useMe()            the current user; only runs while authenticated
+ *   useUpdateMe()      partial profile update; refreshes useMe() on success
  *
  * Usage:
  *   const { data: me, isLoading } = useMe();
