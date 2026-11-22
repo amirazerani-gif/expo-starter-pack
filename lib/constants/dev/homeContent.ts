@@ -10,7 +10,13 @@ export const HERO = {
   title: "Expo Starter Pack",
   tagline:
     "A production-ready Expo template: tabs, an auth-gated dashboard, a typed data layer and a themed UI kit, running end to end before you have a server.",
-  tags: ["Expo SDK 58", "Expo Router", "TanStack Query", "OpenAPI", "TypeScript"],
+  tags: [
+    "Expo SDK 58",
+    "Expo Router",
+    "TanStack Query",
+    "OpenAPI",
+    "TypeScript",
+  ],
 };
 
 export const FEATURES: { icon: IconName; title: string; text: string }[] = [
@@ -77,7 +83,7 @@ export const STRUCTURE = `app/               routes only: layouts, guards, thin 
   (dashboard)/     the signed-in area, guarded by _layout.tsx
     dev/           the demo mini app (example only)
 screens/
-  dev/             the Home and Data screens (example only)
+  dev/             the Home, Data and dashboard screens (example only)
 components/
   ui/              the UI kit
   navigation/      tab bar, header, drawer content
@@ -92,7 +98,7 @@ lib/
   constants/dev/   the guide's text (example only)
   queryClient.ts   the query client and its wiring
 openapi/           the demo contract served by the mock
-scripts/           gen-api.mjs`;
+scripts/           gen-api.mjs, strip-example.mjs`;
 
 export const CUSTOMIZE: { icon: IconName; title: string; text: string }[] = [
   {
@@ -118,7 +124,7 @@ export const CUSTOMIZE: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "trash-outline",
     title: "Remove the example",
-    text: "Everything that only exists to teach lives in folders named dev. See Safe to delete below for the exact list.",
+    text: "Run npm run strip-example to delete the guide and the demo dashboard in one go. Everything that only exists to teach lives in folders named dev; see Safe to delete below.",
   },
 ];
 
@@ -134,7 +140,13 @@ export const SAFE_TO_DELETE = {
 components/dev/           the guide's building blocks and live examples
 lib/constants/dev/        the guide's text
 app/(dashboard)/dev/      the demo mini app routes`,
-  note: "Afterwards, point app/(tabs)/index.tsx and the second tab at your own screens. The UI kit in components/ui, the navigation shell and the data layer stay.",
+  note: "Deleting by hand: afterwards, point app/(tabs)/index.tsx and the second tab at your own screens, and rename the dashboard group in app/(dashboard)/_layout.tsx. The UI kit in components/ui, the navigation shell and the data layer stay.",
+  script: {
+    title: "Or let the script do it",
+    text: "npm run strip-example removes all of the above and the resources nothing uses afterwards, then leaves a Hello world Home screen and a Hello dashboard behind. It lists every change and waits for your yes, refuses to run unless your git working tree is clean, and runs the type-check before and after. It stays in the project afterwards and just reports that there is nothing left to strip.",
+    code: "npm run strip-example -- --dry-run   # preview only, changes nothing\nnpm run strip-example                # preview, confirm, strip, type-check\ngit restore . && git clean -fd       # undo, if you want it back",
+    note: "The -- after the script name passes the flag through npm to the script. Other flags: --yes skips the prompt and --skip-tsc skips the type-checks.",
+  },
 };
 
 export const UI_KIT_INTRO =

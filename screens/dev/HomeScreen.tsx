@@ -7,7 +7,8 @@
  * (homeContent.ts and componentDocs.ts), the examples in
  * components/dev/componentDemos.tsx, and the building blocks in
  * components/dev. Everything example-only lives in folders named dev and is
- * safe to delete (see "Safe to delete" on the screen).
+ * safe to delete (see "Safe to delete" on the screen), by hand or with
+ * npm run strip-example.
  */
 import { CodeBlock } from "@/components/dev/codeBlock";
 import { COMPONENT_DEMOS } from "@/components/dev/componentDemos";
@@ -161,6 +162,16 @@ export default function HomeScreen() {
         <Text size="xs" dim>
           {SAFE_TO_DELETE.note}
         </Text>
+        <Card style={{ gap: spacing.sm }}>
+          <Text medium>{SAFE_TO_DELETE.script.title}</Text>
+          <Text size="sm" dim>
+            {SAFE_TO_DELETE.script.text}
+          </Text>
+          <CodeBlock code={SAFE_TO_DELETE.script.code} />
+          <Text size="xs" dim>
+            {SAFE_TO_DELETE.script.note}
+          </Text>
+        </Card>
       </View>
 
       {/* ── UI kit ───────────────────────────────────────────── */}
