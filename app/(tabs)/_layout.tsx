@@ -24,7 +24,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "App",
           tabBarIcon: ({ color }) => (
             <Ionicons
               name="home-outline"
@@ -35,12 +35,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="account"
+        name="data"
         options={{
-          title: "Account",
+          title: "Data",
           tabBarIcon: ({ color }) => (
             <Ionicons
-              name="person-outline"
+              name="server-outline"
               size={22}
               color={typeof color === "string" ? color : undefined}
             />

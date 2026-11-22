@@ -12,11 +12,11 @@
 import { CodeBlock } from "@/components/dev/codeBlock";
 import { COMPONENT_DEMOS } from "@/components/dev/componentDemos";
 import { DocSection } from "@/components/dev/docSection";
+import { IconRow, SectionTitle } from "@/components/dev/guideBlocks";
 import { TAB_BAR_CLEARANCE } from "@/components/navigation/tabbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Icon, type IconName } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { COMPONENT_DOCS } from "@/lib/constants/dev/componentDocs";
 import {
@@ -37,55 +37,6 @@ import { router } from "expo-router";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-function SectionTitle({ title, text }: { title: string; text?: string }) {
-  return (
-    <View style={{ gap: 2 }}>
-      <Text size="xl" bold>
-        {title}
-      </Text>
-      {text ? (
-        <Text size="sm" dim>
-          {text}
-        </Text>
-      ) : null}
-    </View>
-  );
-}
-
-function IconRow({
-  icon,
-  title,
-  text,
-}: {
-  icon: IconName;
-  title: string;
-  text: string;
-}) {
-  const { theme, radius, spacing } = useTheme();
-  return (
-    <View style={{ flexDirection: "row", gap: spacing.sm + 2 }}>
-      <View
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: radius.sm,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: theme.backgroundSecondary,
-        }}
-      >
-        <Icon name={icon} size={18} color={theme.primary} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <Text medium>{title}</Text>
-        <Text size="sm" dim>
-          {text}
-        </Text>
-      </View>
-    </View>
-  );
-}
 
 export default function HomeScreen() {
   const { theme, spacing } = useTheme();
