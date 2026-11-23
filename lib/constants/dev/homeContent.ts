@@ -56,7 +56,7 @@ export const QUICK_START: { title: string; text: string; code?: string }[] = [
   {
     title: "Create your app",
     text: "Scaffold a project from the template.",
-    code: "npx create-expo-app my-app --template expo-starter-pack",
+    code: "npx create-expo-app my-app --template @amirgazerani/expo-starter-pack",
   },
   {
     title: "Point it at the mock",
