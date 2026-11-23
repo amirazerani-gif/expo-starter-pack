@@ -26,9 +26,9 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 /** Top-level groups directly under (dashboard) that are valid destinations. */
-const VALID_DASHBOARD_GROUPS = ["user"];
+const VALID_DASHBOARD_GROUPS = ["dev"];
 /** Where signed-in users land when no valid group is in the URL. */
-const DEFAULT_GROUP = "user";
+const DEFAULT_GROUP = "dev";
 
 export default function DashboardLayout() {
   const isAuthenticated = useAuthStore((s) => s.status === "authed");

@@ -1,45 +1,48 @@
 /**
  * hooks/core/useErrorListener.tsx
  * Displays errors published to the error store as toasts. Mount
- * <ErrorToastListener /> once, inside the root layout, next to <Toaster />.
+ * <ErrorToastListener /> once, inside the root layout, next to <ToastHost />.
  *
- * To change how an error type looks (emoji, title), edit ERROR_CONFIG.
- * Server and network errors stay on screen longer than the rest.
+ * To change how an error type looks (title, toast style), edit ERROR_CONFIG.
+ * Server and network errors stay on screen longer than the rest. The message,
+ * the extra validation lines and the HTTP status badge come from the error.
  */
-import { useErrorStore } from "@/stores/core/error.store";
-import { useEffect, useRef } from "react";
-import { toast } from "sonner-native";
+import { toast, type ToastType } from "@/components/ui/toast";
+import { useErrorStore, type ErrorType } from "@/stores/core/error.store";
+import { useEffect } from "react";
 
-const ERROR_CONFIG: Record<string, { emoji: string; title: string }> = {
-  validation: { emoji: "⚠️", title: "Validation Error" },
-  auth: { emoji: "🔒", title: "Session Expired" },
-  forbidden: { emoji: "🚫", title: "Access Denied" },
-  not_found: { emoji: "🔍", title: "Not Found" },
-  server: { emoji: "🛠️", title: "Server Error" },
-  network: { emoji: "📡", title: "Network Error" },
-  unknown: { emoji: "❌", title: "Something went wrong" },
+const ERROR_CONFIG: Record<ErrorType, { title: string; type: ToastType }> = {
+  validation: { title: "Validation Error", type: "warning" },
+  auth: { title: "Session Expired", type: "warning" },
+  forbidden: { title: "Access Denied", type: "warning" },
+  not_found: { title: "Not Found", type: "info" },
+  server: { title: "Server Error", type: "error" },
+  network: { title: "Network Error", type: "error" },
+  unknown: { title: "Something went wrong", type: "error" },
 };
 
 export function ErrorToastListener() {
   const error = useErrorStore((s) => s.error);
-  const clearError = useErrorStore((s) => s.clearError);
-  const prevErrorRef = useRef<typeof error>(null);
 
   useEffect(() => {
-    if (!error || error === prevErrorRef.current) return;
-    prevErrorRef.current = error;
-
+    if (!error) return;
     const config = ERROR_CONFIG[error.type] ?? ERROR_CONFIG.unknown;
 
-    toast.error(`${config.emoji} ${config.title}`, {
-      description: error.message,
+    // `message` already holds the first validation error: list the rest.
+    const rest = error.validationErrors
+      ? Object.values(error.validationErrors).flat().slice(1)
+      : [];
+
+    toast.show({
+      type: config.type,
+      title: config.title,
+      message: error.message,
+      details: rest.length > 0 ? rest : undefined,
+      meta: error.status !== null ? String(error.status) : undefined,
       duration:
         error.type === "server" || error.type === "network" ? 5000 : 3500,
-      onDismiss: () => {
-        clearError();
-        prevErrorRef.current = null;
-      },
     });
+    useErrorStore.getState().clearError();
   }, [error]);
 
   return null;

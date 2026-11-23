@@ -5,19 +5,21 @@
  * Boot sequence: the splash screen stays visible until fonts are loaded and
  * the stored auth token has been read (`hydrate()`), so route guards never
  * see an undetermined auth state. /me loads later, in the background.
+ * The fonts to load are `appFonts` in theme/typography.ts.
  *
  * Provider tree: gestures > query client > safe area > navigation theme.
- * <ErrorToastListener /> and <Toaster /> sit inside it to display global
+ * <ErrorToastListener /> and <ToastHost /> sit inside it to display global
  * errors. useConnectivityGuard sends the user to /no-internet while offline
  * and back to the previous route when the connection returns.
  *
  * To add a global provider, wrap it inside RootLayoutNav. Register new
  * top-level route groups as <Stack.Screen /> entries below.
  */
+import { ToastHost } from "@/components/ui/toast";
 import { ErrorToastListener } from "@/hooks/core/useErrorListener";
-import { appFonts } from "@/lib/fonts";
 import { queryClient, useAppFocus } from "@/lib/queryClient";
 import { useAuthStore } from "@/stores/dev/auth.store";
+import { appFonts } from "@/theme";
 import NetInfo from "@react-native-community/netinfo";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
@@ -34,7 +36,6 @@ import { useEffect, useRef } from "react";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Toaster } from "sonner-native";
 
 // Silence console output in production builds.
 if (!__DEV__) {
@@ -148,7 +149,7 @@ function RootLayoutNav() {
               <Stack.Screen name="modal" options={{ presentation: "modal" }} />
             </Stack>
             <ErrorToastListener />
-            <Toaster position="top-center" richColors />
+            <ToastHost />
           </ThemeProvider>
         </SafeAreaProvider>
       </QueryClientProvider>

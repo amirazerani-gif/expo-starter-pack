@@ -1,232 +1,151 @@
-import { useTheme } from "@/theme";
-import { Ionicons } from "@expo/vector-icons";
+/**
+ * components/ui/input.tsx
+ * ─────────────────────────────────────────────────────────────
+ * Single-line text input.
+ *
+ *   <Input label="Email" leftIcon="mail-outline" value={v} onChangeText={set}
+ *          error={fieldErrors.email} />
+ *   <Input label="Password" showPasswordToggle secureTextEntry ... />
+ *
+ * Props   label, hint, error, size (sm | md | lg, default md), disabled,
+ *         leftIcon / rightIcon (Ionicons names), onRightIconPress,
+ *         showPasswordToggle, containerStyle. Every TextInput prop passes
+ *         through, and the ref points at the TextInput.
+ * Border  border color by default, primary when focused, error when invalid.
+ * Font    family and size come from theme/typography.ts.
+ * ─────────────────────────────────────────────────────────────
+ */
+import {
+  controlMetrics,
+  fontFamilyOf,
+  scaledFont,
+  useTheme,
+  type ControlSize,
+} from "@/theme";
 import React, { useState } from "react";
 import {
   Pressable,
-  StyleSheet,
   TextInput,
-  TextInputProps,
   View,
-  ViewStyle,
+  type StyleProp,
+  type TextInputProps,
+  type ViewStyle,
 } from "react-native";
-import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import { Text } from "./text";
+import { Field, useFieldBox, type TextInputRef } from "./field";
+import { Icon, type IconName } from "./icon";
 
-interface InputProps extends TextInputProps {
+export interface InputProps extends TextInputProps {
   label?: string;
+  hint?: string;
   error?: string;
-  iconName?: string;
-  rightElement?: React.ReactNode;
-  showPasswordToggle?: boolean;
+  size?: ControlSize;
   disabled?: boolean;
-  containerStyle?: ViewStyle;
+  leftIcon?: IconName;
+  rightIcon?: IconName;
+  onRightIconPress?: () => void;
+  showPasswordToggle?: boolean;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
-export function Input({
-  label,
-  error,
-  iconName,
-  rightElement,
-  showPasswordToggle = false,
-  disabled = false,
-  containerStyle,
-  style,
-  secureTextEntry,
-  ...props
-}: InputProps) {
-  const { theme, radius } = useTheme();
+export const Input = React.forwardRef<TextInputRef, InputProps>(function Input(
+  {
+    label,
+    hint,
+    error,
+    size = "md",
+    disabled = false,
+    leftIcon,
+    rightIcon,
+    onRightIconPress,
+    showPasswordToggle = false,
+    containerStyle,
+    style,
+    secureTextEntry,
+    onFocus,
+    onBlur,
+    ...props
+  },
+  ref,
+) {
+  const { theme } = useTheme();
+  const m = controlMetrics(size);
   const [focused, setFocused] = useState(false);
-  const [hidePassword, setHidePassword] = useState(true);
-
-  const borderColor = error
-    ? theme.error
-    : focused
-      ? theme.primary
-      : theme.border;
-
-  const isSecure = showPasswordToggle ? hidePassword : secureTextEntry;
+  const [hidden, setHidden] = useState(true);
+  const box = useFieldBox({ error, focused, disabled });
 
   return (
-    <View style={[{ gap: verticalScale(6) }, containerStyle]}>
-      {label && (
-        <Text
-          size="xs"
-          bold
-          style={{ color: theme.textSecondary, letterSpacing: 1.2 }}
-        >
-          {label.toUpperCase()}
-        </Text>
-      )}
-
+    <Field
+      label={label}
+      hint={hint}
+      error={error}
+      containerStyle={containerStyle}
+    >
       <View
         style={[
-          s.field,
+          box,
           {
-            height: verticalScale(48),
-            borderRadius: radius.md,
-            borderColor,
-            backgroundColor: disabled
-              ? theme.backgroundSecondary
-              : theme.surface,
-            paddingHorizontal: scale(14),
+            height: m.height,
+            alignItems: "center",
+            paddingHorizontal: m.paddingX,
+            gap: m.gap,
           },
         ]}
       >
-        {iconName && (
-          <Ionicons
-            name={iconName as any}
-            size={moderateScale(18)}
-            color={theme.textTertiary}
-            style={{ marginRight: scale(8) }}
-          />
-        )}
+        {leftIcon ? (
+          <Icon name={leftIcon} size={m.icon} color={theme.textTertiary} />
+        ) : null}
 
         <TextInput
+          ref={ref}
           {...props}
           editable={!disabled}
-          multiline={false}
-          numberOfLines={1}
-          secureTextEntry={isSecure}
+          secureTextEntry={showPasswordToggle ? hidden : secureTextEntry}
+          placeholderTextColor={theme.textTertiary}
           onFocus={(e) => {
             setFocused(true);
-            props.onFocus?.(e);
+            onFocus?.(e);
           }}
           onBlur={(e) => {
             setFocused(false);
-            props.onBlur?.(e);
+            onBlur?.(e);
           }}
-          placeholderTextColor={theme.textTertiary}
           style={[
-            s.input,
             {
-              color: theme.textPrimary,
-              fontSize: moderateScale(14),
-              height: verticalScale(48),
+              flex: 1,
+              height: "100%",
               paddingVertical: 0,
+              color: theme.textPrimary,
+              fontFamily: fontFamilyOf(),
+              fontSize: scaledFont(m.font),
             },
             style,
           ]}
         />
 
-        {showPasswordToggle && (
-          <Pressable onPress={() => setHidePassword((p) => !p)} hitSlop={8}>
-            <Ionicons
-              name={hidePassword ? "eye-off-outline" : "eye-outline"}
-              size={moderateScale(18)}
+        {showPasswordToggle ? (
+          <Pressable
+            onPress={() => setHidden((h) => !h)}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={hidden ? "Show password" : "Hide password"}
+          >
+            <Icon
+              name={hidden ? "eye-off-outline" : "eye-outline"}
+              size={m.icon}
               color={theme.textTertiary}
             />
           </Pressable>
-        )}
-
-        {!showPasswordToggle && rightElement}
+        ) : rightIcon ? (
+          <Pressable
+            onPress={onRightIconPress}
+            disabled={!onRightIconPress}
+            hitSlop={8}
+            accessibilityRole={onRightIconPress ? "button" : undefined}
+          >
+            <Icon name={rightIcon} size={m.icon} color={theme.textTertiary} />
+          </Pressable>
+        ) : null}
       </View>
-
-      {error && (
-        <Text size="xs" style={{ color: theme.error }}>
-          {error}
-        </Text>
-      )}
-    </View>
+    </Field>
   );
-}
-
-interface TextAreaProps extends Omit<InputProps, "showPasswordToggle"> {
-  numberOfLines?: number;
-}
-
-export function TextArea({
-  numberOfLines = 4,
-  containerStyle,
-  style,
-  label,
-  error,
-  iconName,
-  disabled = false,
-  ...props
-}: TextAreaProps) {
-  const { theme, radius } = useTheme();
-  const [focused, setFocused] = useState(false);
-
-  const borderColor = error
-    ? theme.error
-    : focused
-      ? theme.primary
-      : theme.border;
-
-  return (
-    <View style={[{ gap: verticalScale(6) }, containerStyle]}>
-      {label && (
-        <Text
-          size="xs"
-          bold
-          style={{ color: theme.textSecondary, letterSpacing: 1.2 }}
-        >
-          {label.toUpperCase()}
-        </Text>
-      )}
-
-      <View
-        style={[
-          s.field,
-          {
-            height: verticalScale(numberOfLines * 28),
-            borderRadius: radius.md,
-            borderColor,
-            backgroundColor: disabled
-              ? theme.backgroundSecondary
-              : theme.surface,
-            paddingHorizontal: scale(14),
-            paddingVertical: verticalScale(10),
-            alignItems: "flex-start",
-          },
-        ]}
-      >
-        {iconName && (
-          <Ionicons
-            name={iconName as any}
-            size={moderateScale(18)}
-            color={theme.textTertiary}
-            style={{ marginRight: scale(8), marginTop: 2 }}
-          />
-        )}
-
-        <TextInput
-          {...props}
-          editable={!disabled}
-          multiline
-          numberOfLines={numberOfLines}
-          onFocus={(e) => {
-            setFocused(true);
-            props.onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setFocused(false);
-            props.onBlur?.(e);
-          }}
-          placeholderTextColor={theme.textTertiary}
-          textAlignVertical="top"
-          style={[
-            s.input,
-            {
-              color: theme.textPrimary,
-              fontSize: moderateScale(14),
-              flex: 1,
-            },
-            style,
-          ]}
-        />
-      </View>
-
-      {error && (
-        <Text size="xs" style={{ color: theme.error }}>
-          {error}
-        </Text>
-      )}
-    </View>
-  );
-}
-
-const s = StyleSheet.create({
-  field: { flexDirection: "row", alignItems: "center", borderWidth: 1 },
-  input: { flex: 1 },
 });
