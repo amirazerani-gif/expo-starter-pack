@@ -21,7 +21,7 @@ import { useMe } from "@/hooks/resources/dev/User.r";
 import { useAuthStore } from "@/stores/dev/auth.store";
 import { useTheme } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useCanGoBack } from "expo-router";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,7 +37,8 @@ export function AppHeader({ title, back }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
   const isAuthenticated = useAuthStore((s) => s.status === "authed");
   const { data: me } = useMe();
-  const showBack = back ?? router.canGoBack();
+  const canGoBack = useCanGoBack();
+  const showBack = back ?? canGoBack;
 
   return (
     <View
