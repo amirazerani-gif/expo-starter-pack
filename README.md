@@ -173,6 +173,7 @@ Props, signatures and live examples for every component are on the Home tab, and
 | `expo-linear-gradient` | Gradient buttons and cards |
 | `@expo/vector-icons` | Icons (Ionicons) |
 | `react-native-reanimated` | Installed; the UI kit animates with React Native's `Animated` |
+| `expo-system-ui` | Makes `userInterfaceStyle: "automatic"` work on Android, so the light and dark theme follows the system |
 
 ## Further Reading
 

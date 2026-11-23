@@ -32,7 +32,9 @@ const DEFAULT_GROUP = "dev";
 
 export default function DashboardLayout() {
   const isAuthenticated = useAuthStore((s) => s.status === "authed");
-  const segments = useSegments();
+  // Typed as string[] on purpose: before the first `expo start` generates the
+  // typed routes, useSegments() is a one-element tuple and segments[1] fails.
+  const segments = useSegments() as string[];
   const router = useRouter();
   const { theme } = useTheme();
   const [ready, setReady] = useState(false);
