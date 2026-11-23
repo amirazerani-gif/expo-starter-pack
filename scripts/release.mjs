@@ -26,6 +26,11 @@
  *   6. with --publish: publishes, sets dist-tags, creates and pushes the
  *      git tag
  * Your working tree is never modified.
+ *
+ * Local templates: create-expo-app only treats --template as a file when it
+ * starts with "file:", "." or the path separator. A Windows path such as
+ * C:\...\x.tgz starts with none of them, so it would be looked up on npm as a
+ * package name. Always pass the tarball as file:<path>.
  */
 import { execSync } from "node:child_process";
 import fs from "node:fs";
@@ -258,6 +263,9 @@ const tarball = path.join(
   packInfo.filename.replace(/^@/, "").replace("/", "-"),
 );
 if (!fs.existsSync(tarball)) fail(`Expected tarball not found: ${tarball}`);
+// create-expo-app needs the "file:" prefix to treat this as a local file
+// (see the note in the header: a Windows path would be read as a package name).
+const templateArg = `file:${tarball}`;
 say(
   `Packed ${files.length} files, ${(packInfo.size / 1024).toFixed(0)} kB (${(packInfo.unpackedSize / 1024).toFixed(0)} kB unpacked).`,
 );
@@ -271,10 +279,19 @@ if (!flags.has("--skip-scaffold")) {
   fs.mkdirSync(out);
   try {
     sh(
-      `npx --yes create-expo-app@latest ${appName} --template ${q(tarball)} --no-install --yes`,
+      `npx --yes create-expo-app@latest ${appName} --template ${q(templateArg)} --no-install --yes`,
       {
         cwd: out,
-        env: { ...process.env, CI: "1" },
+        // The git identity is set so create-expo-app can make its initial
+        // commit even on a machine where git has no user configured.
+        env: {
+          ...process.env,
+          CI: "1",
+          GIT_AUTHOR_NAME: "release-test",
+          GIT_AUTHOR_EMAIL: "release-test@example.com",
+          GIT_COMMITTER_NAME: "release-test",
+          GIT_COMMITTER_EMAIL: "release-test@example.com",
+        },
       },
     );
   } catch (e) {
@@ -350,7 +367,7 @@ if (!flags.has("--skip-scaffold")) {
 }
 
 say("\nTry it yourself:");
-say(`  npx create-expo-app my-test --template ${q(tarball)}`);
+say(`  npx create-expo-app my-test --template ${q(templateArg)}`);
 
 // ─── 6. Publish ─────────────────────────────────────────────────
 if (!flags.has("--publish")) {
