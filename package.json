@@ -1,5 +1,5 @@
 {
-  "name": "@amirgazerani/expo-starter-pack",
+  "name": "expo-starter-pack",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
@@ -49,5 +49,6 @@
     "gen:api": "node --env-file=.env scripts/gen-api.mjs",
     "mock": "npx -y @stoplight/prism-cli mock -h 0.0.0.0 -p 4010 openapi/openapi.yaml",
     "strip-example": "node scripts/strip-example.mjs"
-  }
+  },
+  "private": true
 }
