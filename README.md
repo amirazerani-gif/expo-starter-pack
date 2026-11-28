@@ -4,6 +4,12 @@ A production-ready Expo starter with a public tab interface, an auth-gated dashb
 
 > Built on **Expo SDK 58** (React Native 0.88, React 19.3) with the **New Architecture**. It ships with a local mock backend, so it runs end to end before you have a server.
 
+https://github.com/user-attachments/assets/0da3b438-e002-47d4-9123-2e1707458351
+
+```bash
+npx create-expo-app my-app --template @amirgazerani/expo-starter-pack
+```
+
 ---
 
 ## What's Included
